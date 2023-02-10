@@ -9,7 +9,7 @@ import Pins from "./Pins";
 import { userQuery } from "../utils/data";
 
 const Home = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
   const [toggleSidebar, setToggleSidebar] = useState(false);
 
   const scrollRef = useRef(null);
@@ -20,7 +20,7 @@ const Home = () => {
       : localStorage.clear();
 
   useEffect(() => {
-    const query = userQuery(userInfo?.sub);
+    const query = userQuery(userInfo?.googleId);
 
     client.fetch(query).then((data) => {
       setUser(data[0]);
@@ -51,6 +51,7 @@ const Home = () => {
             <img
               src={user?.image}
               alt={user?.name}
+              referrerpolicy="no-referrer"
               className="w-9 h-9 rounded-full "
             />
           </Link>

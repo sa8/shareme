@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 //import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import GoogleLogin from "react-google-login";
 import { useNavigate } from "react-router-dom";
@@ -6,33 +6,52 @@ import { FcGoogle } from "react-icons/fc";
 import shareVideo from "../assets/share.mp4";
 import logo from "../assets/logowhite.png";
 import jwt_decode from "jwt-decode";
+import { gapi } from "gapi-script";
 
 import { client } from "../client";
 
 const Login = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: process.env.REACT_APP_GOOGLE_API_TOKEN,
+        scope: "",
+      });
+    }
+    gapi.load("client:auth2", start);
+  });
   const responseGoogle = (response) => {
-    console.log(response);
-    localStorage.setItem("user", JSON.stringify(response.profileObj));
-    var decodedHeader = jwt_decode(response.credential);
-    //const { name, googleId, imageUrl } = response.profileObj;
-    const { name, sub, picture } = decodedHeader;
-    console.log(decodedHeader);
-    const doc = {
-      _id: sub,
-      _type: "user",
-      userName: name,
-      image: picture,
-    };
-    // const doc = {
-    //   _id: googleId,
-    //   _type: "user",
-    //   userName: name,
-    //   image: imageUrl,
-    // };
-    client.createIfNotExists(doc).then(() => {
-      navigate("/", { replace: true });
-    });
+    try {
+      console.log("reponse is");
+      console.log(response);
+      localStorage.setItem("user", JSON.stringify(response.profileObj));
+      console.log("here 1");
+      //var decodedHeader = jwt_decode(response.credential, { header: true });
+      console.log("here 2");
+      //const { name, sub, picture } = response.profileObj;
+      const { name, googleId, imageUrl } = response.profileObj;
+      //const { name, sub, picture } = decodedHeader;
+      console.log("decoded header");
+      //console.log(decodedHeader);
+      // const doc = {
+      //   _id: sub,
+      //   _type: "user",
+      //   userName: name,
+      //   image: picture,
+      // };
+      const doc = {
+        _id: googleId,
+        _type: "user",
+        userName: name,
+        image: imageUrl,
+      };
+      client.createIfNotExists(doc).then(() => {
+        navigate("/", { replace: true });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
