@@ -7,6 +7,7 @@ import { client } from "../client";
 import logo from "../assets/logo.png";
 import Pins from "./Pins";
 import { userQuery } from "../utils/data";
+import { fetchUser } from "../utils/fetchUser";
 
 const Home = () => {
   const [user, setUser] = useState();
@@ -14,10 +15,7 @@ const Home = () => {
 
   const scrollRef = useRef(null);
 
-  const userInfo =
-    localStorage.getItem("user") !== "undefined"
-      ? JSON.parse(localStorage.getItem("user"))
-      : localStorage.clear();
+  const userInfo = fetchUser();
 
   useEffect(() => {
     const query = userQuery(userInfo?.googleId);
@@ -51,7 +49,7 @@ const Home = () => {
             <img
               src={user?.image}
               alt={user?.name}
-              referrerpolicy="no-referrer"
+              referrerPolicy="no-referrer"
               className="w-9 h-9 rounded-full "
             />
           </Link>
